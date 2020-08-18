@@ -1,23 +1,41 @@
 let express = require("express");
 const bodyParser = require("body-parser");
+var mongoose = require("mongoose");
 
 const app=express();
+
+mongoose.connect('mongodb://localhost:27017/yelp_camp', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => console.log('Connected to DB!'))
+.catch(error => console.log(error.message));
 
 app.set("view engine","ejs");
 app.use(bodyParser.urlencoded({extended:true}))
 
-let campgrounds=[
-  {name:"salmon Creek", image:"https://images.pexels.com/photos/699558/pexels-photo-699558.jpeg?auto=compress&cs=tinysrgb&h=350"},
-  {name:"Granite Lake", image:"https://images.pexels.com/photos/2398220/pexels-photo-2398220.jpeg?auto=compress&cs=tinysrgb&h=350"},
-  {name:"Silent Hill", image:"https://images.pexels.com/photos/1539225/pexels-photo-1539225.jpeg?auto=compress&cs=tinysrgb&h=350"}
-];
+
+//schema setup
+var campgroundSchema=mongoose.Schema(({
+  name:String,
+  image:String
+}));
+
+var Campground = mongoose.model("Campground",campgroundSchema);
 
 app.get("/",(req,res)=>{
   res.render("landing");
 })
 
 app.get("/campgrounds",(req,res)=>{
-  res.render("campgrounds",{campgrounds:campgrounds});
+  Campground.find({},function(err,campgrounds){
+    if(err){
+      console.log("error while searching");
+    }
+    else{
+      res.render("campgrounds",{campgrounds:campgrounds});
+    }
+  });
 })
 
 app.get("/campgrounds/new",(req,res)=>{
@@ -26,7 +44,12 @@ app.get("/campgrounds/new",(req,res)=>{
 
 app.post("/campgrounds",(req,res)=>{
   let campData={name:req.body.name,image:req.body.image};
-  campgrounds.push(campData);
+  Campground.create(campData,function(err,campground){
+    if(err)
+    console.log("unable to create camp ground");
+    else
+    console.log("campground created");
+  });
   res.redirect("/campgrounds");
 })
 
