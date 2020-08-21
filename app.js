@@ -18,7 +18,8 @@ app.use(bodyParser.urlencoded({extended:true}))
 //schema setup
 var campgroundSchema=mongoose.Schema(({
   name:String,
-  image:String
+  image:String,
+  description:String
 }));
 
 var Campground = mongoose.model("Campground",campgroundSchema);
@@ -27,23 +28,28 @@ app.get("/",(req,res)=>{
   res.render("landing");
 })
 
+
+//show campgrounds
 app.get("/campgrounds",(req,res)=>{
   Campground.find({},function(err,campgrounds){
     if(err){
       console.log("error while searching");
     }
     else{
-      res.render("campgrounds",{campgrounds:campgrounds});
+      res.render("index",{campgrounds:campgrounds});
     }
   });
 })
 
+
+//display form to create new campground
 app.get("/campgrounds/new",(req,res)=>{
   res.render("new");
 })
 
+//create campground
 app.post("/campgrounds",(req,res)=>{
-  let campData={name:req.body.name,image:req.body.image};
+  let campData={name:req.body.name,image:req.body.image, description:req.body.description};
   Campground.create(campData,function(err,campground){
     if(err)
     console.log("unable to create camp ground");
@@ -51,6 +57,17 @@ app.post("/campgrounds",(req,res)=>{
     console.log("campground created");
   });
   res.redirect("/campgrounds");
+})
+
+app.get("/campgrounds/:id",(req,res)=>{
+  Campground.findById(req.params.id,function(err,campground){
+    if(err){
+      console.log("error while searching");
+    }
+    else{
+      res.render("show",{campground:campground});
+    }
+  });
 })
 
 app.listen(3000,()=>{
