@@ -1,8 +1,9 @@
 let express = require("express");
 const bodyParser = require("body-parser");
 var mongoose = require("mongoose");
-var Campground= require("./models/campground.js");
+var Campground= require("./models/campground");
 var seedDB = require("./seeds");
+var Comment = require("./models/comment");
 
 seedDB();
 
@@ -30,7 +31,7 @@ app.get("/campgrounds",(req,res)=>{
       console.log("error while searching");
     }
     else{
-      res.render("index",{campgrounds:campgrounds});
+      res.render("campgrounds/index",{campgrounds:campgrounds});
     }
   });
 })
@@ -38,7 +39,7 @@ app.get("/campgrounds",(req,res)=>{
 
 //display form to create new campground
 app.get("/campgrounds/new",(req,res)=>{
-  res.render("new");
+  res.render("campgrounds/new");
 })
 
 //create campground
@@ -59,9 +60,41 @@ app.get("/campgrounds/:id",(req,res)=>{
       console.log("error while searching");
     }
     else{
-      res.render("show",{campground:campground});
+      res.render("campgrounds/show",{campground:campground});
     }
   });
+})
+
+//adding new comment to a particular campground
+app.get("/campgrounds/:id/comments/new",(req,res)=>{
+  Campground.findById(req.params.id,(err,campground)=>{
+    if(err)
+      console.log("error occoured");
+    else
+      res.render("comments/new",{campground:campground});
+  })
+  
+})
+
+app.post("/campgrounds/:id/comments",(req,res)=>{
+  Campground.findById(req.params.id,(err,campground)=>{
+    if(err){
+      console.log("error occoured");
+      res.redirect("/campgrounds");
+    }
+    else{
+      Comment.create(req.body.comment,(err,comment)=>{
+        if(err)
+          console.log("error occoured");
+        else{
+          campground.comments.push(comment);
+          campground.save();
+          console.log("created new comment");
+          res.redirect("/campgrounds/"+campground._id);
+        }
+      })
+    }
+  })
 })
 
 app.listen(3000,()=>{
