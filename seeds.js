@@ -34,41 +34,41 @@ function seedDB() {
   Campground.remove({}, (err) => {
     if (err)
       console.log("error while deleteing");
-    else {
-      Comment.remove({}, (err) => {
-        if (err)
-          console.log("error while deleting");
-        else
-          User.remove({}, (err) => {
-            if (err)
-              console.log("error")
-            else {
-              console.log("removed campgrounds");
-              data.forEach((seed) => {
-                Campground.create(seed, (err, campground) => {
-                  if (err)
-                    console.log("error");
-                  else
-                    console.log("campground created");
-                  //create comment on each campground
-                  Comment.create({
-                    text: "this place is great, But i wish there was internet",
-                    author: "shashank sah"
-                  }, (err, comment) => {
-                    if (err)
-                      console.log("error occoured");
-                    else {
-                      campground.comments.push(comment);
-                      campground.save();
-                      console.log("created new comment");
-                    }
-                  })
-                })
-              })
-            }
-          })
-      })
-    }
+    // else {
+    //   Comment.remove({}, (err) => {
+    //     if (err)
+    //       console.log("error while deleting");
+    //     else
+    //       User.remove({}, (err) => {
+    //         if (err)
+    //           console.log("error")
+    //         else {
+    //           console.log("removed campgrounds");
+    //           data.forEach((seed) => {
+    //             Campground.create(seed, (err, campground) => {
+    //               if (err)
+    //                 console.log("error");
+    //               else
+    //                 console.log("campground created");
+    //               //create comment on each campground
+    //               Comment.create({
+    //                 text: "this place is great, But i wish there was internet",
+    //                 author: "shashank sah"
+    //               }, (err, comment) => {
+    //                 if (err)
+    //                   console.log("error occoured");
+    //                 else {
+    //                   campground.comments.push(comment);
+    //                   campground.save();
+    //                   console.log("created new comment");
+    //                 }
+    //               })
+    //             })
+    //           })
+    //         }
+    //       })
+    //   })
+    // }
   })
 }
 
