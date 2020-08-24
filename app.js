@@ -37,6 +37,11 @@ mongoose.connect('mongodb://localhost:27017/yelp_camp', {
 app.set("view engine","ejs");
 app.use(bodyParser.urlencoded({extended:true}))
 
+app.use((req,res,next)=>{
+  res.locals.currentUser=req.user;
+  next();
+})
+
 app.get("/",(req,res)=>{
   res.render("landing");
 })
@@ -56,12 +61,12 @@ app.get("/campgrounds",(req,res)=>{
 
 
 //display form to create new campground
-app.get("/campgrounds/new",(req,res)=>{
+app.get("/campgrounds/new",isLoggedIn,(req,res)=>{
   res.render("campgrounds/new");
 })
 
 //create campground
-app.post("/campgrounds",(req,res)=>{
+app.post("/campgrounds",isLoggedIn,(req,res)=>{
   let campData={name:req.body.name,image:req.body.image, description:req.body.description};
   Campground.create(campData,function(err,campground){
     if(err)
